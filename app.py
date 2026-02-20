@@ -42,13 +42,20 @@ def predict(image, model_choice):
     # Generate caption
     raw_caption = generate_caption(model_choice, image, processors, models, device)
     
-    # Clean up the caption (remove the prompt if it exists)
-    # The prompt is "Vocabulary: .... Caption: "
-    if "Caption: " in raw_caption:
-        caption = raw_caption.split("Caption: ")[-1].strip()
-    else:
-        caption = raw_caption.strip()
+    # Since vocabulary prompt is removed, we just need to handle potential 
+    # model echoes of the instruction "a photo of" or similar.
+    # GIT and GPT2 sometimes repeat the input prompt.
     
+    caption = raw_caption.strip()
+    
+    # Heuristic: if the caption starts with our prompt, remove it
+    from model_utils import CAPTION_PROMPT
+    p = CAPTION_PROMPT.strip().lower()
+    if caption.lower().startswith(p):
+        caption = caption[len(p):].strip()
+        # Remove leading punctuation/noise if any
+        caption = re.sub(r'^[^a-zA-Z0-9]+', '', caption).strip()
+
     # Classify safety
     safety_status = classifier.classify(caption)
     

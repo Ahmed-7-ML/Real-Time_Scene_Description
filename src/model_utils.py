@@ -25,7 +25,7 @@ SAFETY_TOKENS = [
 ]
 
 hazards_str = ', '.join(SAFETY_TOKENS)
-CAPTION_PROMPT = f"Vocabulary: {hazards_str}. Caption: "
+CAPTION_PROMPT = f"Caption: "
 
 def load_git(device="cpu"):
     print("Loading GIT model...")
