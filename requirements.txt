@@ -1,0 +1,11 @@
+gradio
+transformers
+torch
+torchvision
+pillow
+pandas
+evaluate
+absl-py
+rouge-score
+nltk
+scikit-learn
