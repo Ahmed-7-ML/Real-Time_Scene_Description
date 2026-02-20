@@ -9,3 +9,4 @@ absl-py
 rouge-score
 nltk
 scikit-learn
+opencv-python
