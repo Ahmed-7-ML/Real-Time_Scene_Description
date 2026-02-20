@@ -6,26 +6,8 @@ from transformers import (
     AutoTokenizer
 )
 
-# --- CONFIGURATION: Safety Tokens & Control ---
-SAFETY_TOKENS = [
-    "hole", "holes", "open hole",
-    "puddle", "puddles",
-    "mud", "muddy",
-    "flooded", "flood",
-    "construction", "construction site",
-    "debris", "rubble",
-    "broken", "damaged", "crack", "uneven",
-    "obstacle", "blocked", "barrier",
-    "fire", "smoke",
-    "accident", "crash",
-    "train", "railway", "tracks",
-    "scaffolding", "tools",
-    "icy", "snow", "slippery",
-    "trash", "garbage", "clutter"
-]
-
-hazards_str = ', '.join(SAFETY_TOKENS)
-CAPTION_PROMPT = f"Caption: "
+# --- CONFIGURATION ---
+CAPTION_PROMPT = ""
 
 def load_git(device="cpu"):
     print("Loading GIT model...")

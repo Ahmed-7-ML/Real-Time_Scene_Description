@@ -42,19 +42,31 @@ def predict(image, model_choice):
     # Generate caption
     raw_caption = generate_caption(model_choice, image, processors, models, device)
     
-    # Since vocabulary prompt is removed, we just need to handle potential 
-    # model echoes of the instruction "a photo of" or similar.
-    # GIT and GPT2 sometimes repeat the input prompt.
+    # The model might echo instructions or generate its own markers.
+    # We want to strip anything that looks like "caption:", "generate a description:", etc.
+    import re
     
     caption = raw_caption.strip()
     
-    # Heuristic: if the caption starts with our prompt, remove it
-    from model_utils import CAPTION_PROMPT
-    p = CAPTION_PROMPT.strip().lower()
-    if caption.lower().startswith(p):
-        caption = caption[len(p):].strip()
-        # Remove leading punctuation/noise if any
-        caption = re.sub(r'^[^a-zA-Z0-9]+', '', caption).strip()
+    # List of known instruction/marker patterns to strip if they appear at the start
+    noise_patterns = [
+        r'^generate\s+a\s+description\s+for\s+this\s+image\.?',
+        r'^caption\s*:\s*',
+        r'^a\s+photo\s+of\s+',
+        r'^an\s+image\s+of\s+'
+    ]
+    
+    # Aggressively remove noise from the beginning
+    for pattern in noise_patterns:
+        caption = re.sub(pattern, '', caption, flags=re.IGNORECASE).strip()
+    
+    # Secondary check: if "caption:" appears anywhere, take what follows its last occurrence
+    if "caption:" in caption.lower():
+        parts = re.split(r'caption\s*:\s*', caption, flags=re.IGNORECASE)
+        caption = parts[-1].strip()
+
+    # Final clean: remove any leading non-alphanumeric characters (like : or -)
+    caption = re.sub(r'^[^a-zA-Z0-9]+', '', caption).strip()
 
     # Classify safety
     safety_status = classifier.classify(caption)
